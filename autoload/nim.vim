@@ -218,11 +218,12 @@ function! GotoDefinition_nim_ready(def_output) abort
   let defBits = split(rawDef, '\t')
   let file = defBits[4]
   let line = defBits[5]
+  let column = defBits[6]
 
   if bufloaded(file)   " Not sure we don't want bufexists() here instead
-    exe printf('buffer +%d %s',line, file)
+    exe printf('buffer +call\ cursor(%d,%d) %s',line, column + 1, file)
   else
-    exe printf('e +%d %s', line, file)
+    exe printf('e +call\ cursor(%d,%d) %s', line, column + 1, file)
   endif
 
   return 1
