@@ -140,7 +140,7 @@ fun! NimExec(op)
 
   let isDirty = getbufvar(bufnr('%'), "&modified")
   if isDirty
-    let tmp = tempname() . bufname("%") . "_dirty.nim"
+    let tmp = tempname() . fnamemodify(bufname('%'), ':t:r') . "_dirty.nim"
     silent! exe ":w " . tmp
     let tmp = substitute(tmp, '\\', '/', 'g')
 
