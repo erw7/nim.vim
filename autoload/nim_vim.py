@@ -101,7 +101,7 @@ def nimExecCmd(project, cmd, async = True):
     target = NimProjects[project]
   else:
     server = copy.copy(vim.vars['nim_server_cmd'][0:])
-    if version_info[0] == 3:
+    if version_info[0] == 3 and isinstance(server[0], bytes):
       for i in range(len(server)):
           server[i] = server[i].decode()
     target = nimStartService(server, project)

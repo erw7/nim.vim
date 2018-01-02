@@ -153,7 +153,17 @@ fun! NimExec(op)
     exe printf("%s nimExecCmd('%s', '%s', False)", s:py_cmd, b:nim_project_root, cmd)
     let output = l:py_res
   else
+    if has('win32') && has('nvim')
+      let l:saved_shellxescape = &shellxescape
+      let &shellxescape = ''
+      let l:saved_shellxquote = &shellxquote
+      let &shellxquote = ''
+    endif
     let output = system(printf(s:nim_cmd_template, cmd, project_file))
+    if has('win32') && has('nvim')
+      let &shellxescape = l:saved_shellxescape
+      let &shellxquote = l:saved_shellxquote
+    endif
   endif
   let output = substitute(output, '.\{-}>\s\+', '', '')
 
