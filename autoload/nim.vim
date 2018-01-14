@@ -82,14 +82,6 @@ augroup NimVim
   exe printf("au VimLeavePre * :%s nimTerminateAll()", s:py_cmd)
 augroup END
 
-command! NimLog :e log://nim
-
-command! NimTerminateService
-  \ :exe printf("%s nimTerminateService('%s')", s:py_cmd, b:nim_project_root)
-
-command! NimRestartService
-  \ :exe printf("%s nimRestartService('%s')", s:py_cmd, b:nim_project_root)
-
 fun! s:CurrentNimFile()
   let save_cur = getpos('.')
   call cursor(0, 0, 0)
