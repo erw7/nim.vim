@@ -1,7 +1,7 @@
 let g:nim_log = []
 let s:plugin_path = escape(expand('<sfile>:p:h'), '\')
 
-if !exists("g:nim_caas_enabled")
+if !exists('g:nim_caas_enabled')
   let g:nim_caas_enabled = 0
 endif
 
@@ -9,10 +9,10 @@ if !executable('nim')
   echoerr "the Nim compiler must be in your system's PATH"
 endif
 
-if has("python3")
+if has('python3')
   exe 'py3file ' . fnameescape(s:plugin_path) . '/nim_vim.py'
   let s:py_cmd = 'py3 '
-elseif has("python")
+elseif has('python')
   exe 'pyfile ' . fnameescape(s:plugin_path) . '/nim_vim.py'
   let s:py_cmd = 'py '
 endif
@@ -41,11 +41,11 @@ else
   let s:nim_cmd_generator = 'printf(''idetools %s --track:"%s,%d,%d"'', a:op, substitute(expand(''%:p''), ''\\'', "/", "g"), line("."), col(".") - 1)'
 endif
 
-fun! nim#init()
-  let cmd = printf("nim --dump.format:json --verbosity:0 dump %s", s:CurrentNimFile())
+function! nim#init() abort
+  let cmd = printf('nim --dump.format:json --verbosity:0 dump %s', s:CurrentNimFile())
   let raw_dumpdata = system(cmd)
-  if !v:shell_error && expand("%:e") == "nim"
-    let dumpdata = eval(substitute(raw_dumpdata, "\n", "", "g"))
+  if !v:shell_error && expand('%:e') ==? 'nim'
+    let dumpdata = eval(substitute(raw_dumpdata, "\n", '', 'g'))
 
     let b:nim_project_root = substitute(dumpdata['project_path'], '\\', '/', 'g')
     let b:nim_defined_symbols = dumpdata['defined_symbols']
@@ -53,7 +53,7 @@ fun! nim#init()
 
     for path in dumpdata['lib_paths']
       if finddir(path) == path
-        let &l:path = path . "," . &l:path
+        let &l:path = path . ',' . &l:path
       endif
     endfor
   else
@@ -61,7 +61,7 @@ fun! nim#init()
   endif
 endf
 
-fun! s:UpdateNimLog()
+fun! s:UpdateNimLog() abort
   setlocal buftype=nofile
   setlocal bufhidden=hide
   setlocal noswapfile
@@ -78,22 +78,21 @@ endf
 augroup NimVim
   au!
   au BufEnter log://nim call s:UpdateNimLog()
-  " au QuitPre * :py nimTerminateAll()
-  exe printf("au VimLeavePre * :%s nimTerminateAll()", s:py_cmd)
+  exe printf('au VimLeavePre * :%s nimTerminateAll()', s:py_cmd)
 augroup END
 
-fun! s:CurrentNimFile()
+function! s:CurrentNimFile() abort
   let save_cur = getpos('.')
   call cursor(0, 0, 0)
-  
+
   let PATTERN = "\\v^\\#\\s*included from \\zs.*\\ze"
-  let l = search(PATTERN, "n")
+  let l = search(PATTERN, 'n')
 
   if l != 0
     let f = matchstr(getline(l), PATTERN)
-    let l:to_check = expand('%:h') . "/" . f
+    let l:to_check = expand('%:h') . '/' . f
   else
-    let l:to_check = expand("%")
+    let l:to_check = expand('%')
   endif
 
   call setpos('.', save_cur)
@@ -120,20 +119,20 @@ let g:nim_symbol_types = {
   \ 'skEnumField': 'v',
   \ }
 
-fun! NimExec(op)
+function! NimExec(op) abort
 
   " This is the "projectfile.nim that nimsuggest wants. It defaluts to
   " the file we're operating on and only set to a real project file if the
   " appropriate  global configuration is set.
   let project_file = s:CurrentNimFile()
-  if g:nim_use_nimsuggest && exists("g:nim_project_file")
+  if g:nim_use_nimsuggest && exists('g:nim_project_file')
     let project_file = g:nim_project_file
   endif
 
-  let isDirty = getbufvar(bufnr('%'), "&modified")
+  let isDirty = getbufvar(bufnr('%'), '&modified')
   if isDirty
-    let tmp = tempname() . fnamemodify(bufname('%'), ':t:r') . "_dirty.nim"
-    silent! exe ":w " . tmp
+    let tmp = tempname() . fnamemodify(bufname('%'), ':t:r') . '_dirty.nim'
+    silent! exe ':w ' . tmp
     let tmp = substitute(tmp, '\\', '/', 'g')
 
     let cmd = eval(s:nim_dirty_cmd_generator)
@@ -163,18 +162,18 @@ fun! NimExec(op)
   return output
 endf
 
-fun! NimExecAsync(op, Handler)
+function! NimExecAsync(op, Handler) abort
   let result = NimExec(a:op)
   call a:Handler(result)
 endf
 
-fun! NimComplete(findstart, base)
+function! NimComplete(findstart, base) abort
   if b:nim_caas_enabled == 0
     return -1
   endif
 
   if a:findstart
-    if synIDattr(synIDtrans(synID(line("."),col("."),1)), "name") == 'Comment'
+    if synIDattr(synIDtrans(synID(line('.'),col('.'),1)), 'name') ==# 'Comment'
       return -1
     endif
     return col('.')
@@ -183,7 +182,7 @@ fun! NimComplete(findstart, base)
     let sugOut = NimExec(s:nim_suggestions_option)
     for line in split(sugOut, '\n')
       let lineData = split(line, '\t')
-      if len(lineData) > 0 && lineData[0] == "sug"
+      if len(lineData) > 0 && lineData[0] ==? 'sug'
         let kind = get(g:nim_symbol_types, lineData[1], '')
         let c = { 'word': lineData[2], 'kind': kind, 'menu': lineData[3], 'dup': 1 }
         call add(result, c)
@@ -193,7 +192,7 @@ fun! NimComplete(findstart, base)
   endif
 endf
 
-if !exists("g:neocomplcache_omni_patterns")
+if !exists('g:neocomplcache_omni_patterns')
   let g:neocomplcache_omni_patterns = {}
 endif
 let g:neocomplcache_omni_patterns['nim'] = '[^. *\t]\.\w*'
@@ -203,78 +202,59 @@ if !exists('g:neocomplete#sources#omni#input_patterns')
 endif
 let g:neocomplete#sources#omni#input_patterns['nim'] = '[^. *\t]\.\w*'
 
-let g:nim_completion_callbacks = {}
-
-fun! NimAsyncCmdComplete(cmd, output)
-  call add(g:nim_log, a:output)
-  echom g:nim_completion_callbacks
-  if has_key(g:nim_completion_callbacks, a:cmd)
-    let Callback = get(g:nim_completion_callbacks, a:cmd)
-    call Callback(a:output)
-    " remove(g:nim_completion_callbacks, a:cmd)
-  else
-    echom "ERROR, Unknown Command: " . a:cmd
-  endif
-  return 1
-endf
-
-fun! GotoDefinition_nim_ready(def_output)
+function! GotoDefinition_nim_ready(def_output) abort
   if !g:nim_caas_enabled && v:shell_error
-    echo "nim was unable to locate the definition. exit code: " . v:shell_error
+    echo 'nim was unable to locate the definition. exit code: ' . v:shell_error
     " echoerr a:def_output
     return 0
   endif
-  
+
   let rawDef = matchstr(a:def_output, 'def\t\([^\n]*\)')
-  if rawDef == ""
-    echo "the current cursor position does not match any definitions"
+  if rawDef ==? ''
+    echo 'the current cursor position does not match any definitions'
     return 0
   endif
-  
+
   let defBits = split(rawDef, '\t')
   let file = defBits[4]
   let line = defBits[5]
 
   if bufloaded(file)   " Not sure we don't want bufexists() here instead
-    exe printf("buffer +%d %s",line, file)
+    exe printf('buffer +%d %s',line, file)
   else
-    exe printf("e +%d %s", line, file)
+    exe printf('e +%d %s', line, file)
   endif
 
   return 1
 endf
 
-fun! GotoDefinition_nim()
-  call NimExecAsync(s:nim_definitions_option, function("GotoDefinition_nim_ready"))
-endf
-
-fun! FindReferences_nim()
-  setloclist()
+function! GotoDefinition_nim() abort
+  call NimExecAsync(s:nim_definitions_option, function('GotoDefinition_nim_ready'))
 endf
 
 " Syntastic syntax checking
-fun! SyntaxCheckers_nim_nim_GetLocList()
+function! SyntaxCheckers_nim_nim_GetLocList() abort
   let makeprg = 'nim check --hints:off --listfullpaths ' . s:CurrentNimFile()
   let errorformat = &errorformat
-  
+
   return SyntasticMake({ 'makeprg': makeprg, 'errorformat': errorformat })
 endf
 
-function! SyntaxCheckers_nim_nim_IsAvailable()
-  return executable("nim")
+function! SyntaxCheckers_nim_nim_IsAvailable() abort
+  return executable('nim')
 endfunction
 
-if exists("g:SyntasticRegistry")
+if exists('g:SyntasticRegistry')
   call g:SyntasticRegistry.CreateAndRegisterChecker({
       \ 'filetype': 'nim',
       \ 'name': 'nim'})
 endif
 
-if !exists("g:quickrun_config")
+if !exists('g:quickrun_config')
   let g:quickrun_config = {}
 endif
 
-if !exists("g:quickrun_config.nim")
-  let g:quickrun_config.nim = { "exec": "nim c --run --verbosity:0 %S" }
+if !exists('g:quickrun_config.nim')
+  let g:quickrun_config.nim = { 'exec': 'nim c --run --verbosity:0 %S' }
 endif
 

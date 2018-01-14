@@ -13,7 +13,7 @@ except ImportError:
   class Vim:
     def command(self, x):
       print("Executing vim command: " + x)
-  
+
   vim = Vim()
 
 class NimThread(threading.Thread):
@@ -54,7 +54,7 @@ class NimThread(threading.Thread):
       self.nim.stdin.write(msg + "\n")
       self.nim.stdin.flush()
       result = ""
-      
+
       while True:
         line = self.nim.stdout.readline()
         result += line
@@ -64,7 +64,7 @@ class NimThread(threading.Thread):
           else:
             self.asyncOpComplete(msg, result)
           break
-        
+
 
 def nimVimEscape(expr):
   return expr.replace("\\", "\\\\").replace('"', "\\\"").replace("\n", "\\n")
@@ -105,13 +105,13 @@ def nimExecCmd(project, cmd, async = True):
       for i in range(len(server)):
           server[i] = server[i].decode()
     target = nimStartService(server, project)
-  
+
   result = target.postNimCmd(cmd, async)
-  
+
   if not async:
     vim.command('let l:py_res = "' + nimVimEscape(result) + '"')
 
 def nimTerminateAll():
   for thread in NimProjects.values():
     thread.postNimCmd("quit")
-    
+
