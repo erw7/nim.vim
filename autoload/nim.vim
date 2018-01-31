@@ -188,10 +188,12 @@ function! NimComplete(findstart, base) abort
     for line in split(sugOut, '\n')
       let lineData = split(line, '\t')
       if len(lineData) > 0 && lineData[0] ==? 'sug'
-        let kind = get(g:nim_symbol_types, lineData[1], '')
         let word = split(lineData[2], '\.')[-1]
-        let c = { 'word': word, 'kind': kind, 'menu': lineData[3], 'dup': 1 }
-        call add(result, c)
+        if a:base ==? '' || word =~# '^' . a:base
+          let kind = get(g:nim_symbol_types, lineData[1], '')
+          let c = { 'word': word, 'kind': kind, 'menu': lineData[3], 'dup': 1 }
+          call add(result, c)
+        endif
       endif
     endfor
     return result
