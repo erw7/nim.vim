@@ -176,7 +176,12 @@ function! NimComplete(findstart, base) abort
     if synIDattr(synIDtrans(synID(line('.'),col('.'),1)), 'name') ==# 'Comment'
       return -1
     endif
-    return col('.')
+    let line = getline('.')
+    let start = col('.') - 1
+    while start > 0 && line[start - 1] =~? '\w'
+      let start -= 1
+    endwhile
+    return start
   else
     let result = []
     let sugOut = NimExec(s:nim_suggestions_option)
