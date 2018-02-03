@@ -240,12 +240,3 @@ endf
 function! GotoDefinition_nim() abort
   call NimExecAsync(s:nim_definitions_option, function('GotoDefinition_nim_ready'))
 endf
-
-if !exists('g:quickrun_config')
-  let g:quickrun_config = {}
-endif
-
-if !exists('g:quickrun_config.nim')
-  let g:quickrun_config.nim = { 'exec': 'nim c --run --verbosity:0 %S' }
-endif
-
