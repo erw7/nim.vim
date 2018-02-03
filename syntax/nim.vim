@@ -82,11 +82,11 @@ syn match nimEscapeError "\\x\x\=\X" display contained
 
 if nim_highlight_numbers == 1
   " numbers (including longs and complex)
-  syn match   nimNumber	"\v<0[bB][01]%(_?[01])*%(\'%(%(%(i|I|u|U)%(8|16|32|64))|u|U|%(%(f|F)%(32|64|128)?)|d|D))?>"
-  syn match   nimNumber	"\v<0[ocC]\o%(_?\o)*%(\'%(%((i|I|u|U)%(8|16|32|64))|u|U|%(%(f|F)%(32|64|128)?)|d|D))?>"
-  syn match   nimNumber	"\v<0[xX]\x%(_?\x)*%(\'%(%(%(i|I|u|U)%(8|16|32|64))|u|U|%(%(f|F)%(32|64|128)?)|d|D))?>"
-  syn match   nimNumber	"\v<\d%(_?\d)*%(\.\d%(_?\d)*)?%([eE][+-]?\d%(_?\d)*)?%(\'%(%(%(f|F)%(32|64|128)?)|d|D))?>"
-  syn match   nimNumber	"\v<\d%(_?\d)*%(\'%(%(%(i|I|u|U)%(8|16|32|64))|u|U|%(%(f|F)%(32|64|128)?)|d|D))?\.@!>"
+  syn match   nimNumber	"\v<0[bB][01]%(_?[01])*%(\'%(%(i|I|u|U)%(8|16|32|64)|u|U|%(f|F)%(32|64|128)?|d|D))?>"
+  syn match   nimNumber	"\v<0[ocC]\o%(_?\o)*%(\'%(%(i|I|u|U)%(8|16|32|64)|u|U|%(f|F)%(32|64|128)?|d|D))?>"
+  syn match   nimNumber	"\v<0[xX]\x%(_?\x)*%(\'%(%(i|I|u|U)%(8|16|32|64)|u|U|%(f|F)%(32|64|128)?|d|D))?>"
+  syn match   nimNumber	"\v<\d%(_?\d)*%(\.\d%(_?\d)*)?%([eE][+-]?\d%(_?\d)*)?%(\'%(%(f|F)%(32|64|128)?|d|D))?>"
+  syn match   nimNumber	"\v<\d%(_?\d)*%(\'%(%(i|I|u|U)%(8|16|32|64)|u|U|%(f|F)%(32|64|128)?|d|D))?\.@!>"
 endif
 
 if nim_highlight_builtins == 1
