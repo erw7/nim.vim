@@ -1,4 +1,4 @@
-let g:nim_log = []
+let s:nim_log = []
 let s:plugin_path = escape(expand('<sfile>:p:h'), '\')
 
 if !exists('g:nim_caas_enabled')
@@ -66,11 +66,11 @@ fun! s:UpdateNimLog() abort
   setlocal bufhidden=hide
   setlocal noswapfile
 
-  for entry in g:nim_log
+  for entry in s:nim_log
     call append(line('$'), split(entry, "\n"))
   endfor
 
-  let g:nim_log = []
+  let s:nim_log = []
 
   match Search /^nim\ .*/
 endf
@@ -99,7 +99,7 @@ function! s:CurrentNimFile() abort
   return substitute(fnamemodify(l:to_check, ':p'), '\\', '/', 'g')
 endf
 
-let g:nim_symbol_types = {
+let s:nim_symbol_types = {
   \ 'skParam': 'v',
   \ 'skVar': 'v',
   \ 'skLet': 'v',
@@ -158,7 +158,7 @@ function! NimExec(op) abort
   endif
   let output = substitute(output, '.\{-}>\s\+', '', '')
 
-  call add(g:nim_log, cmd . "\n" . output)
+  call add(s:nim_log, cmd . "\n" . output)
   return output
 endf
 
@@ -190,7 +190,7 @@ function! NimComplete(findstart, base) abort
       if len(lineData) > 0 && lineData[0] ==? 'sug'
         let word = split(lineData[2], '\.')[-1]
         if a:base ==? '' || word =~# '^' . a:base
-          let kind = get(g:nim_symbol_types, lineData[1], '')
+          let kind = get(s:nim_symbol_types, lineData[1], '')
           let c = { 'word': word, 'kind': kind, 'menu': lineData[3], 'dup': 1 }
           call add(result, c)
         endif
