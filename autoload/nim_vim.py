@@ -38,14 +38,14 @@ class NimThread(threading.Thread):
        startupinfo = si,
        bufsize = 1)
  
-  def postNimCmd(self, msg, async = True):
-    self.tasks.put((msg, async))
-    if not async:
+  def postNimCmd(self, msg, is_async = True):
+    self.tasks.put((msg, is_async))
+    if not is_async:
       return self.responses.get()
 
   def run(self):
     while True:
-      (msg, async) = self.tasks.get()
+      (msg, is_async) = self.tasks.get()
 
       if msg == "quit":
         self.nim.terminate()
@@ -59,7 +59,7 @@ class NimThread(threading.Thread):
         line = self.nim.stdout.readline()
         result += line
         if re.match('^(?:\n|>\s*)$', line) is not None:
-          if not async:
+          if not is_async:
             self.responses.put(result)
           else:
             self.asyncOpComplete(msg, result)
@@ -95,7 +95,7 @@ def nimRestartService(project):
         server[i] = server[i].decode()
   nimStartService(server, project)
 
-def nimExecCmd(project, cmd, async = True):
+def nimExecCmd(project, cmd, is_async = True):
   target = None
   if project in NimProjects:
     target = NimProjects[project]
@@ -106,9 +106,9 @@ def nimExecCmd(project, cmd, async = True):
           server[i] = server[i].decode()
     target = nimStartService(server, project)
 
-  result = target.postNimCmd(cmd, async)
+  result = target.postNimCmd(cmd, is_async)
 
-  if not async:
+  if not is_async:
     vim.command('let l:py_res = "' + nimVimEscape(result) + '"')
 
 def nimTerminateAll():
