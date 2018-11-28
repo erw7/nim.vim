@@ -6,7 +6,10 @@ if !exists('g:nim_caas_enabled')
 endif
 
 if !executable('nim')
-  echoerr "the Nim compiler must be in your system's PATH"
+  echohl WarningMsg |
+        \  echomsg "the Nim compiler must be in your system's PATH" |
+        \  echohl None
+  finish
 endif
 
 if has('python3')

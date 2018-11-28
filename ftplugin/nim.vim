@@ -7,7 +7,10 @@ let b:did_ftplugin = 1
 let s:cpo_save = &cpo
 set cpo&vim
 
-call nim#init()
+try
+  call nim#init()
+catch /E117-*/
+endtry
 
 setlocal formatoptions-=t formatoptions+=croql
 setlocal comments=:##,:#
